@@ -1,10 +1,12 @@
 ﻿using Guilded.Base;
 using Guilded.Base.Content;
 using RestSharp;
-using Serilog;
 
 namespace Serilog.GuildedSink;
 
+/// <summary>
+/// Represents a Guilded webhook client
+/// </summary>
 public class WebhookClient : BaseGuildedService
 {
     public WebhookClient() : base(new Uri(GuildedUrl.Media, "webhooks"))

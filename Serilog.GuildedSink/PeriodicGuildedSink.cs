@@ -7,6 +7,9 @@ using Serilog.Sinks.PeriodicBatching;
 
 namespace Serilog.GuildedSink;
 
+/// <summary>
+/// The guilded sink.
+/// </summary>
 public class PeriodicGuildedSink : IBatchedLogEventSink
 {
     private readonly string   _webhookUrl;
