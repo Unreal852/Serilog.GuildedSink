@@ -14,7 +14,12 @@ public static class LoggerConfigurationExtensions
     /// <returns>The logger configuration</returns>
     public static LoggerConfiguration Guilded(this LoggerSinkConfiguration loggerSinkConfiguration, string webhookUrl)
     {
-        return Guilded(loggerSinkConfiguration, webhookUrl, TimeSpan.FromSeconds(5));
+        return Guilded(loggerSinkConfiguration, null, null, webhookUrl, TimeSpan.FromSeconds(5));
+    }
+
+    public static LoggerConfiguration Guilded(this LoggerSinkConfiguration loggerSinkConfiguration, string? webhookUsername, Uri? webhookAvatar, string webhookUrl)
+    {
+        return Guilded(loggerSinkConfiguration, webhookUsername, webhookAvatar, webhookUrl, TimeSpan.FromSeconds(5));
     }
 
     /// <summary>
@@ -24,9 +29,11 @@ public static class LoggerConfigurationExtensions
     /// <param name="webhookUrl">The guilded webhook url</param>
     /// <param name="delayBetweenBatches">The delay between each batches</param>
     /// <returns>The logger configuration</returns>
-    public static LoggerConfiguration Guilded(this LoggerSinkConfiguration loggerSinkConfiguration, string webhookUrl, TimeSpan delayBetweenBatches)
+    public static LoggerConfiguration Guilded(this LoggerSinkConfiguration loggerSinkConfiguration,
+                                              string? webhookUsername, Uri? webhookAvatar, string webhookUrl,
+                                              TimeSpan delayBetweenBatches)
     {
-        var guildedSink = new PeriodicGuildedSink(webhookUrl, delayBetweenBatches);
+        var guildedSink = new PeriodicGuildedSink(webhookUsername, webhookAvatar, webhookUrl, delayBetweenBatches);
 
         var batchingOptions = new PeriodicBatchingSinkOptions
         {

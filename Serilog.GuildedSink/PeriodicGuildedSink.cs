@@ -2,6 +2,7 @@
 using System.Drawing;
 using Guilded.Base.Content;
 using Guilded.Base.Embeds;
+using Guilded.Webhook;
 using Serilog.Events;
 using Serilog.Sinks.PeriodicBatching;
 
@@ -12,21 +13,27 @@ namespace Serilog.GuildedSink;
 /// </summary>
 public class PeriodicGuildedSink : IBatchedLogEventSink
 {
-    private readonly string   _webhookUrl;
+    private readonly string   _webhookUsername;
+    private readonly Uri?     _webhookAvatar;
+    private readonly Uri      _webhookUrl;
     private readonly TimeSpan _delayBetweenBatches;
 
-    public PeriodicGuildedSink(string webhookUrl, TimeSpan delayBetweenBatches)
+    public PeriodicGuildedSink(string? webhookUsername, Uri? webhookAvatar, string webhookUrl, TimeSpan delayBetweenBatches)
     {
-        _webhookUrl = webhookUrl;
+        _webhookUsername = webhookUsername ?? string.Empty;
+        _webhookAvatar = webhookAvatar;
+        _webhookUrl = string.IsNullOrWhiteSpace(webhookUrl) ? throw new ArgumentException("The webhook url is null or empty") : new Uri(webhookUrl);
         _delayBetweenBatches = delayBetweenBatches;
     }
 
-    private WebhookClient WebhookClient { get; } = new();
+    private GuildedWebhookClient WebhookClient { get; } = new(Array.Empty<string>());
 
     public async Task EmitBatchAsync(IEnumerable<LogEvent> batch)
     {
         var messageContent = new MessageContent
         {
+                Username = _webhookUsername,
+                Avatar = _webhookAvatar,
                 Embeds = new Collection<Embed>()
         };
         foreach (LogEvent logEvent in batch)

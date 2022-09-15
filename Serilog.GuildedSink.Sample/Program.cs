@@ -6,10 +6,9 @@ using Serilog.GuildedSink.Extensions;
 
 const int logsAmount = 10;
 const string logMessage
-        = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum";
+        = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
 
 string? guildedWebhookUrl = Environment.GetEnvironmentVariable("GuildedWebhook");
-
 
 if (string.IsNullOrWhiteSpace(guildedWebhookUrl))
 {
@@ -20,7 +19,8 @@ if (string.IsNullOrWhiteSpace(guildedWebhookUrl))
 
 Log.Logger = new LoggerConfiguration()
             .WriteTo.Console()
-            .WriteTo.Guilded(guildedWebhookUrl).CreateLogger();
+            .WriteTo.Guilded("Serilog.GuildedSink Sample",
+                     new Uri("https://raw.githubusercontent.com/serilog/serilog/dev/assets/icon.png"), guildedWebhookUrl).CreateLogger();
 
 var random = new Random();
 var eventLevels = Enum.GetValues<LogEventLevel>();
