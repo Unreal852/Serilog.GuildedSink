@@ -19,8 +19,9 @@ if (string.IsNullOrWhiteSpace(guildedWebhookUrl))
 
 Log.Logger = new LoggerConfiguration()
             .WriteTo.Console()
-            .WriteTo.Guilded("Serilog.GuildedSink Sample",
-                     new Uri("https://raw.githubusercontent.com/serilog/serilog/dev/assets/icon.png"), guildedWebhookUrl).CreateLogger();
+            .WriteTo.Guilded("Serilog",
+                     new Uri("https://raw.githubusercontent.com/serilog/serilog/dev/assets/icon.png"),
+                     guildedWebhookUrl).CreateLogger();
 
 var random = new Random();
 var eventLevels = Enum.GetValues<LogEventLevel>();

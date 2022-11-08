@@ -1,6 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.Drawing;
-using Guilded.Base.Content;
+using Guilded.Base;
 using Guilded.Base.Embeds;
 using Guilded.Webhook;
 using Serilog.Events;
@@ -18,11 +18,14 @@ public class PeriodicGuildedSink : IBatchedLogEventSink
     private readonly Uri      _webhookUrl;
     private readonly TimeSpan _delayBetweenBatches;
 
-    public PeriodicGuildedSink(string? webhookUsername, Uri? webhookAvatar, string webhookUrl, TimeSpan delayBetweenBatches)
+    public PeriodicGuildedSink(string? webhookUsername, Uri? webhookAvatar, string webhookUrl,
+                               TimeSpan delayBetweenBatches)
     {
         _webhookUsername = webhookUsername ?? string.Empty;
         _webhookAvatar = webhookAvatar;
-        _webhookUrl = string.IsNullOrWhiteSpace(webhookUrl) ? throw new ArgumentException("The webhook url is null or empty") : new Uri(webhookUrl);
+        _webhookUrl = string.IsNullOrWhiteSpace(webhookUrl)
+                ? throw new ArgumentException("The webhook url is null or empty")
+                : new Uri(webhookUrl);
         _delayBetweenBatches = delayBetweenBatches;
     }
 
@@ -58,7 +61,8 @@ public class PeriodicGuildedSink : IBatchedLogEventSink
 
             if (logEvent.Exception != null)
             {
-                embed.AddField("**Exception Type**", logEvent.Exception.GetType().FullName ?? logEvent.Exception.GetType().Name);
+                embed.AddField("**Exception Type**",
+                        logEvent.Exception.GetType().FullName ?? logEvent.Exception.GetType().Name);
                 embed.AddField("**Message**", logEvent.Exception.Message);
                 if (logEvent.Exception.StackTrace is { })
                     embed.AddField("**Stack Trace**", logEvent.Exception.StackTrace);
@@ -68,7 +72,14 @@ public class PeriodicGuildedSink : IBatchedLogEventSink
         }
 
         await Task.Delay(_delayBetweenBatches);
-        await WebhookClient.CreateMessageAsync(_webhookUrl, messageContent);
+        try
+        {
+            await WebhookClient.CreateMessageAsync(_webhookUrl, messageContent);
+        }
+        catch (Exception e)
+        {
+            Log.Error(e, "Failed to send logs to the configured webhook");
+        }
     }
 
     public Task OnEmptyBatchAsync()
